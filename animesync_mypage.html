@@ -179,27 +179,35 @@ function showTab(tab, btn) {
 }
 
 function renderWatching() {
-  const wd = ld(gwk());
+  var wd = ld(gwk());
+  var el = document.getElementById("tab-watching");
   var html = "";
-  ANIMES.forEach(function(a) {
+  for (var i = 0; i < ANIMES.length; i++) {
+    var a = ANIMES[i];
     var d = wd[a.id] || {kami:0,yoin:0,fubin:0,total:0};
-    var thumb = a.img
-      ? '<img src="' + a.img + '" alt="" onerror="this.parentElement.innerHTML='' + a.emoji + ''">'
-      : a.emoji;
-    html += '<div class="watch-card">'
-      + '<div class="watch-thumb">' + thumb + '</div>'
-      + '<div class="watch-info">'
-      + '<div class="watch-title">' + a.title + '</div>'
-      + '<div class="watch-meta"><span class="watch-badge ' + a.pk + '">' + a.platform + '</span>'
-      + (d.total > 0 ? '<span style="color:var(--accent);font-family:Bebas Neue,sans-serif;font-size:13px">' + d.total + 'pt</span>' : '')
-      + '</div></div>'
-      + '<div class="watch-emotions">'
-      + '<button class="we-btn kami" onclick="qLog('' + a.id + '','kami')">✨</button>'
-      + '<button class="we-btn yoin" onclick="qLog('' + a.id + '','yoin')">🌊</button>'
-      + '<button class="we-btn fubin" onclick="qLog('' + a.id + '','fubin')">💔</button>'
-      + '</div></div>';
-  });
-  document.getElementById("tab-watching").innerHTML = html;
+    html += "<div class='watch-card'>";
+    html += "<div class='watch-thumb'>";
+    if (a.img) {
+      html += "<img src='" + a.img + "' alt=''>";
+    } else {
+      html += a.emoji;
+    }
+    html += "</div>";
+    html += "<div class='watch-info'>";
+    html += "<div class='watch-title'>" + a.title + "</div>";
+    html += "<div class='watch-meta'>";
+    html += "<span class='watch-badge " + a.pk + "'>" + a.platform + "</span>";
+    if (d.total > 0) {
+      html += "<span style='color:var(--accent);font-size:12px'>" + d.total + "pt</span>";
+    }
+    html += "</div></div>";
+    html += "<div class='watch-emotions'>";
+    html += "<button class='we-btn kami' onclick="qLog('" + a.id + "','kami')">✨</button>";
+    html += "<button class='we-btn yoin' onclick="qLog('" + a.id + "','yoin')">🌊</button>";
+    html += "<button class='we-btn fubin' onclick="qLog('" + a.id + "','fubin')">💔</button>";
+    html += "</div></div>";
+  }
+  el.innerHTML = html;
 }
 
 function qLog(aid, type) {
@@ -311,11 +319,13 @@ function showToast(msg) {
   setTimeout(function() { t.classList.remove("show"); }, 2200);
 }
 
-updateStats();
-renderWatching();
-renderLogs();
-renderRanking();
-renderSubs();
+window.addEventListener("DOMContentLoaded", function() {
+  updateStats();
+  renderWatching();
+  renderLogs();
+  renderRanking();
+  renderSubs();
+});
 </script>
 </body>
 </html>
