@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AnimeSync — 今期作品</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #060810;
+  --bg2:     #0a0e18;
+  --bg3:     #0f1520;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --accent:  #4db8d4;
+  --accent2: #e8608a;
+  --accent3: #6ec47a;
+  --gold:    #f0c040;
+  --purple:  #9b7fe8;
+  --text:    #e0e8f4;
+  --muted:   #445566;
+  --muted2:  #7a8fa8;
+  --nav-h:   60px;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  min-height: 100vh;
+  padding-bottom: calc(var(--nav-h) + 24px);
+}
+body::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.022'/%3E%3C/svg%3E");
+}
+
+/* ===== TOP NAV ===== */
+.topnav {
+  position:sticky; top:0; z-index:100;
+  height:52px;
+  background:rgba(6,8,16,0.92);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 16px;
+}
+.nav-logo {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px; letter-spacing:4px;
+  color:var(--accent);
+  text-shadow:0 0 20px rgba(77,184,212,0.45);
+  cursor:pointer;
+}
+
+/* ===== フィルター ===== */
+.filter-bar {
+  display:flex; gap:6px; padding:12px 16px;
+  overflow-x:auto; scrollbar-width:none;
+  border-bottom:1px solid var(--border);
+  background:var(--bg2);
+  position:sticky; top:52px; z-index:90;
+}
+.filter-bar::-webkit-scrollbar { display:none; }
+.filter-btn {
+  flex-shrink:0; padding:6px 14px; border-radius:20px;
+  border:1px solid var(--border); background:none;
+  font-family:'Noto Sans JP',sans-serif; font-size:11px; font-weight:700;
+  color:var(--muted2); cursor:pointer; transition:all 0.15s;
+  white-space:nowrap;
+}
+.filter-btn.active {
+  background:rgba(77,184,212,0.12);
+  border-color:rgba(77,184,212,0.4);
+  color:var(--accent);
+}
+
+/* ===== グリッド ===== */
+main { position:relative; z-index:1; padding:16px; }
+
+.works-grid {
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:12px;
+}
+
+/* ===== サムネカード ===== */
+.work-card {
+  border-radius:14px; overflow:hidden;
+  background:var(--bg2); border:1px solid var(--border);
+  cursor:pointer; position:relative;
+  transition:transform 0.2s, border-color 0.2s;
+  animation: cardIn 0.4s ease both;
+}
+.work-card:active { transform:scale(0.97); }
+.work-card:hover { border-color:var(--border2); }
+@keyframes cardIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* サムネ部分 */
+.card-thumb {
+  width:100%; aspect-ratio:3/4;
+  position:relative; overflow:hidden;
+}
+.card-thumb-img {
+  width:100%; height:100%; object-fit:cover;
+  display:block;
+  transition:transform 0.3s;
+}
+.work-card:hover .card-thumb-img { transform:scale(1.04); }
+
+/* 画像なし時のダミー */
+.card-thumb-dummy {
+  width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:8px;
+}
+.dummy-emoji { font-size:36px; }
+.dummy-label { font-size:9px; color:var(--muted2); letter-spacing:1px; }
+
+/* グラデーションオーバーレイ */
+.card-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(
+    to bottom,
+    transparent 40%,
+    rgba(6,8,16,0.7) 70%,
+    rgba(6,8,16,0.95) 100%
+  );
+}
+
+/* プラットフォームバッジ（左上） */
+.card-platform {
+  position:absolute; top:8px; left:8px;
+  font-size:9px; font-weight:700; padding:2px 7px;
+  border-radius:4px; letter-spacing:0.5px;
+  backdrop-filter:blur(8px);
+}
+.card-platform.abema { background:rgba(232,96,138,0.85); color:#fff; }
+.card-platform.prime { background:rgba(0,168,107,0.85);  color:#fff; }
+.card-platform.unext { background:rgba(20,20,20,0.85);   color:var(--gold); border:1px solid rgba(240,192,64,0.4); }
+.card-platform.tv    { background:rgba(30,40,60,0.85);   color:var(--muted2); }
+
+/* 曜日バッジ（右上） */
+.card-day {
+  position:absolute; top:8px; right:8px;
+  font-size:10px; font-weight:700; padding:2px 8px;
+  border-radius:4px;
+  background:rgba(6,8,16,0.75); color:var(--muted2);
+  backdrop-filter:blur(8px);
+  border:1px solid var(--border2);
+}
+
+/* タイトル・時間（カード内下部） */
+.card-info-overlay {
+  position:absolute; bottom:0; left:0; right:0;
+  padding:8px 10px;
+}
+.card-time {
+  font-size:10px; color:rgba(255,255,255,0.6);
+  margin-bottom:3px;
+}
+.card-title-overlay {
+  font-size:12px; font-weight:700; line-height:1.3;
+  color:#fff;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+/* カード下部 */
+.card-body {
+  padding:10px 10px 12px;
+}
+.card-emotion-row {
+  display:flex; gap:5px;
+}
+.card-emotion-btn {
+  flex:1; padding:7px 2px; border-radius:8px; cursor:pointer;
+  border:1px solid var(--border); background:rgba(255,255,255,0.03);
+  font-family:'Noto Sans JP',sans-serif; font-size:11px; font-weight:700;
+  color:var(--muted2); transition:all 0.12s; text-align:center;
+}
+.card-emotion-btn:active { transform:scale(0.95); }
+.card-emotion-btn.kami  { background:rgba(240,192,64,0.15); border-color:rgba(240,192,64,0.4); color:var(--gold); }
+.card-emotion-btn.yoin  { background:rgba(77,184,212,0.15); border-color:rgba(77,184,212,0.4); color:var(--accent); }
+.card-emotion-btn.fubin { background:rgba(232,96,138,0.15); border-color:rgba(232,96,138,0.4); color:var(--accent2); }
+
+/* スコア表示 */
+.card-score {
+  display:flex; justify-content:flex-end; align-items:center;
+  gap:4px; margin-top:6px;
+}
+.card-score-num {
+  font-family:'Bebas Neue',sans-serif; font-size:16px; color:var(--accent);
+}
+.card-score-label { font-size:10px; color:var(--muted2); }
+
+/* ===== モーダル ===== */
+.modal-overlay {
+  position:fixed; inset:0; z-index:200;
+  background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(12px);
+  display:flex; align-items:flex-end;
+  opacity:0; pointer-events:none;
+  transition:opacity 0.25s;
+}
+.modal-overlay.show { opacity:1; pointer-events:all; }
+.modal {
+  width:100%; background:var(--bg3);
+  border-radius:20px 20px 0 0;
+  border-top:1px solid var(--border2);
+  padding:20px 20px 48px;
+  transform:translateY(100%);
+  transition:transform 0.3s cubic-bezier(.34,1.1,.64,1);
+  max-height:85vh; overflow-y:auto;
+}
+.modal-overlay.show .modal { transform:translateY(0); }
+.modal-handle {
+  width:36px; height:4px; border-radius:2px;
+  background:var(--muted); margin:0 auto 20px;
+}
+.modal-inner { display:flex; gap:16px; margin-bottom:20px; }
+.modal-thumb {
+  width:100px; flex-shrink:0; border-radius:10px; overflow:hidden;
+  aspect-ratio:3/4; background:var(--bg2);
+}
+.modal-thumb img { width:100%; height:100%; object-fit:cover; }
+.modal-thumb-dummy {
+  width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:32px;
+}
+.modal-meta { flex:1; }
+.modal-title { font-weight:700; font-size:16px; line-height:1.4; margin-bottom:8px; }
+.modal-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px; }
+.modal-tag {
+  font-size:10px; padding:2px 8px; border-radius:4px; font-weight:700;
+}
+.modal-tag.abema { background:rgba(232,96,138,0.2); color:var(--accent2); }
+.modal-tag.prime { background:rgba(110,196,122,0.2); color:var(--accent3); }
+.modal-tag.unext { background:rgba(240,192,64,0.2);  color:var(--gold); }
+.modal-tag.tv    { background:rgba(255,255,255,0.08); color:var(--muted2); }
+.modal-time { font-size:13px; color:var(--muted2); margin-bottom:6px; }
+.modal-note { font-size:11px; color:var(--accent); }
+
+.modal-emotion-row {
+  display:flex; gap:8px; margin-bottom:16px;
+}
+.modal-emotion-btn {
+  flex:1; padding:11px; border-radius:10px; cursor:pointer;
+  border:1px solid var(--border); background:rgba(255,255,255,0.03);
+  font-family:'Noto Sans JP',sans-serif; font-size:13px; font-weight:700;
+  color:var(--muted2); transition:all 0.12s; text-align:center;
+}
+.modal-emotion-btn.kami  { background:rgba(240,192,64,0.15); border-color:rgba(240,192,64,0.4); color:var(--gold); }
+.modal-emotion-btn.yoin  { background:rgba(77,184,212,0.15); border-color:rgba(77,184,212,0.4); color:var(--accent); }
+.modal-emotion-btn.fubin { background:rgba(232,96,138,0.15); border-color:rgba(232,96,138,0.4); color:var(--accent2); }
+
+.modal-score-row {
+  display:flex; gap:10px; justify-content:center;
+  padding:12px; background:var(--bg2); border-radius:10px;
+  border:1px solid var(--border);
+}
+.msr-item { text-align:center; }
+.msr-num { font-family:'Bebas Neue',sans-serif; font-size:22px; }
+.msr-num.kami  { color:var(--gold); }
+.msr-num.yoin  { color:var(--accent); }
+.msr-num.fubin { color:var(--accent2); }
+.msr-label { font-size:10px; color:var(--muted2); }
+.msr-divider { width:1px; background:var(--border); }
+
+/* ===== トースト ===== */
+.toast {
+  position:fixed; bottom:calc(var(--nav-h)+16px); left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:var(--bg3); border:1px solid var(--border2);
+  border-radius:24px; padding:10px 20px;
+  font-size:13px; z-index:300; opacity:0;
+  transition:all 0.25s cubic-bezier(.34,1.56,.64,1);
+  white-space:nowrap; pointer-events:none;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ===== BOTTOM NAV ===== */
+.bottomnav {
+  position:fixed; bottom:0; left:0; right:0; z-index:100;
+  height:var(--nav-h);
+  background:rgba(6,8,16,0.96);
+  backdrop-filter:blur(24px);
+  border-top:1px solid var(--border);
+  display:flex; align-items:center;
+}
+.bn-item {
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  gap:3px; cursor:pointer; padding:8px 0;
+  font-size:10px; color:var(--muted2); transition:color 0.15s;
+}
+.bn-item.active { color:var(--accent); }
+.bn-icon { font-size:20px; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="nav-logo" onclick="location.href='index.html'">AnimeSync</div>
+  <div style="font-size:11px;color:var(--muted2);letter-spacing:2px">2026 春</div>
+</nav>
+
+<!-- フィルターバー -->
+<div class="filter-bar">
+  <button class="filter-btn active" onclick="filterWorks('all',this)">すべて</button>
+  <button class="filter-btn" onclick="filterWorks('abema',this)">ABEMA</button>
+  <button class="filter-btn" onclick="filterWorks('prime',this)">Prime</button>
+  <button class="filter-btn" onclick="filterWorks('unext',this)">Netflix / U-NEXT</button>
+  <button class="filter-btn" onclick="filterWorks('mon',this)">月</button>
+  <button class="filter-btn" onclick="filterWorks('tue',this)">火</button>
+  <button class="filter-btn" onclick="filterWorks('thu',this)">木</button>
+  <button class="filter-btn" onclick="filterWorks('fri',this)">金</button>
+  <button class="filter-btn" onclick="filterWorks('sat',this)">土</button>
+  <button class="filter-btn" onclick="filterWorks('sun',this)">日</button>
+</div>
+
+<main>
+  <div class="works-grid" id="works-grid"></div>
+</main>
+
+<!-- モーダル -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-inner">
+      <div class="modal-thumb" id="modal-thumb"></div>
+      <div class="modal-meta" id="modal-meta"></div>
+    </div>
+    <div class="modal-emotion-row">
+      <button class="modal-emotion-btn kami" id="modal-kami" onclick="modalLogEmotion('kami')">✨ 神<br><small>+5pt</small></button>
+      <button class="modal-emotion-btn yoin" id="modal-yoin" onclick="modalLogEmotion('yoin')">🌊 余韻<br><small>+3pt</small></button>
+      <button class="modal-emotion-btn fubin" id="modal-fubin" onclick="modalLogEmotion('fubin')">💔 不憫<br><small>+1pt</small></button>
+    </div>
+    <div class="modal-score-row" id="modal-score-row"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottomnav">
+  <div class="bn-item" onclick="location.href='index.html'">
+    <span class="bn-icon">🏠</span><span>ホーム</span>
+  </div>
+  <div class="bn-item" onclick="location.href='animesync_calendar.html'">
+    <span class="bn-icon">📅</span><span>スケジュール</span>
+  </div>
+  <div class="bn-item" onclick="location.href='animesync_ranking.html'">
+    <span class="bn-icon">🏆</span><span>ランキング</span>
+  </div>
+  <div class="bn-item active">
+    <span class="bn-icon">🎬</span><span>作品</span>
+  </div>
+  <div class="bn-item" onclick="location.href='animesync_pc.html'">
+    <span class="bn-icon">👤</span><span>マイページ</span>
+  </div>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// アニメデータ
+// ★ imageUrl に各公式サイトの画像URLを入れてください
+// ============================================================
+const ANIMES = [
+  {
+    id:'tongari', title:'とんがり帽子のアトリエ', emoji:'🧙',
+    day:1, dayLabel:'月', time:'23:00', platform:'Netflix', pk:'unext', note:'先行',
+    imageUrl:'', // ← ここに画像URLを入れる
+    color1:'#1a2040', color2:'#2a3060',
+  },
+  {
+    id:'replica', title:'レプリカだって恋をする', emoji:'💘',
+    day:2, dayLabel:'火', time:'24:00', platform:'ABEMA', pk:'abema', note:'先行',
+    imageUrl:'',
+    color1:'#2a1020', color2:'#3a1830',
+  },
+  {
+    id:'marriage', title:'マリッジトキシン', emoji:'💍',
+    day:2, dayLabel:'火', time:'23:00', platform:'Netflix', pk:'unext', note:'',
+    imageUrl:'',
+    color1:'#1a1030', color2:'#2a1840',
+  },
+  {
+    id:'aisiteru', title:'愛してるゲームを終わらせたい', emoji:'🎮',
+    day:2, dayLabel:'火', time:'23:30', platform:'ABEMA', pk:'abema', note:'先行',
+    imageUrl:'',
+    color1:'#201018', color2:'#301820',
+  },
+  {
+    id:'hidari', title:'左ききのエレン', emoji:'🎨',
+    day:2, dayLabel:'火', time:'24:30', platform:'Prime Video', pk:'prime', note:'先行',
+    imageUrl:'',
+    color1:'#102020', color2:'#183030',
+  },
+  {
+    id:'otaku', title:'クラスで2番目に可愛い女の子と友だちになった', emoji:'🎀',
+    day:2, dayLabel:'火', time:'24:00', platform:'U-NEXT', pk:'unext', note:'',
+    imageUrl:'',
+    color1:'#201828', color2:'#302038',
+  },
+  {
+    id:'awashima', title:'淡島百景', emoji:'🌸',
+    day:2, dayLabel:'火', time:'26:15', platform:'ABEMA', pk:'abema', note:'',
+    imageUrl:'',
+    color1:'#281020', color2:'#381830',
+  },
+  {
+    id:'ichitatami', title:'一畳間まんきつ暮らし！', emoji:'🍜',
+    day:2, dayLabel:'火', time:'26:00', platform:'ABEMA', pk:'abema', note:'',
+    imageUrl:'',
+    color1:'#182010', color2:'#283018',
+  },
+  {
+    id:'koori', title:'氷の城壁', emoji:'🧊',
+    day:4, dayLabel:'木', time:'24:30', platform:'Netflix', pk:'unext', note:'先行',
+    imageUrl:'',
+    color1:'#102030', color2:'#183040',
+  },
+  {
+    id:'kiriwo', title:'霧尾ファンクラブ', emoji:'🌫️',
+    day:4, dayLabel:'木', time:'25:00', platform:'ABEMA', pk:'abema', note:'',
+    imageUrl:'',
+    color1:'#181820', color2:'#282830',
+  },
+  {
+    id:'kamiike', title:'上伊那ぼたん、酔える姿は百合の花', emoji:'🌺',
+    day:5, dayLabel:'金', time:'24:00', platform:'ABEMA', pk:'abema', note:'先行',
+    imageUrl:'',
+    color1:'#281018', color2:'#381820',
+  },
+  {
+    id:'otaku2', title:'オタクに優しいギャルはいない', emoji:'💅',
+    day:6, dayLabel:'土', time:'12:00', platform:'ABEMA', pk:'abema', note:'',
+    imageUrl:'',
+    color1:'#201020', color2:'#301830',
+  },
+  {
+    id:'haruyuki', title:'春夏秋冬代行者', emoji:'🍂',
+    day:6, dayLabel:'土', time:'24:00', platform:'Netflix', pk:'unext', note:'',
+    imageUrl:'',
+    color1:'#201810', color2:'#302018',
+  },
+  {
+    id:'kaminiwa', title:'神の庭付き楠木邸', emoji:'🌳',
+    day:6, dayLabel:'土', time:'26:00', platform:'ABEMA', pk:'abema', note:'先行',
+    imageUrl:'',
+    color1:'#102010', color2:'#183018',
+  },
+  {
+    id:'akane', title:'あかね噺', emoji:'🎭',
+    day:0, dayLabel:'日', time:'24:00', platform:'Netflix', pk:'unext', note:'先行',
+    imageUrl:'https://akane-banashi.com/assets/img/top/visual/visual3.jpg',
+    color1:'#281010', color2:'#381818',
+  },
+  {
+    id:'nihonsangoku', title:'日本三國', emoji:'⚔️',
+    day:0, dayLabel:'日', time:'21:00', platform:'Prime Video', pk:'prime', note:'先行',
+    imageUrl:'',
+    color1:'#201010', color2:'#301818',
+  },
+];
+
+const SCORES = { kami:5, yoin:3, fubin:1 };
+const DAY_FILTER = { mon:1, tue:2, wed:3, thu:4, fri:5, sat:6, sun:0 };
+
+function loadData(k){ try{ return JSON.parse(localStorage.getItem(k)||'{}'); }catch(e){ return {}; } }
+function saveData(k,v){ localStorage.setItem(k,JSON.stringify(v)); }
+
+const SEASON_KEY = 'as_rank_season_2026spring';
+function getWeekKey(){
+  const now=new Date(); const d=new Date(now);
+  d.setDate(d.getDate()-d.getDay()+1);
+  return `as_rank_week_${d.getFullYear()}_${String(d.getMonth()+1).padStart(2,'0')}_${String(d.getDate()).padStart(2,'0')}`;
+}
+
+let currentFilter = 'all';
+let currentAnime  = null;
+
+// ============================================================
+// グリッド描画
+// ============================================================
+function renderGrid() {
+  const grid = document.getElementById('works-grid');
+  const weekData   = loadData(getWeekKey());
+  const seasonData = loadData(SEASON_KEY);
+
+  const filtered = ANIMES.filter(a => {
+    if (currentFilter === 'all') return true;
+    if (currentFilter === 'abema')  return a.pk === 'abema';
+    if (currentFilter === 'prime')  return a.pk === 'prime';
+    if (currentFilter === 'unext')  return a.pk === 'unext';
+    const dayNum = DAY_FILTER[currentFilter];
+    return dayNum !== undefined && a.day === dayNum;
+  });
+
+  grid.innerHTML = filtered.map((a, i) => {
+    const score = (weekData[a.id]?.total || 0);
+    const hasImg = a.imageUrl && a.imageUrl.length > 0;
+
+    const thumbHtml = hasImg
+      ? `<img class="card-thumb-img" src="${a.imageUrl}" alt="${a.title}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+      : '';
+    const dummyHtml = `<div class="card-thumb-dummy" style="${hasImg ? 'display:none' : ''}background:linear-gradient(135deg,${a.color1},${a.color2})">
+        <span class="dummy-emoji">${a.emoji}</span>
+        <span class="dummy-label">IMAGE COMING SOON</span>
+      </div>`;
+
+    return `
+      <div class="work-card" style="animation-delay:${i*0.04}s" onclick="openModal('${a.id}')">
+        <div class="card-thumb">
+          ${thumbHtml}${dummyHtml}
+          <div class="card-overlay"></div>
+          <div class="card-platform ${a.pk}">${a.platform}</div>
+          <div class="card-day">${a.dayLabel}曜</div>
+          <div class="card-info-overlay">
+            <div class="card-time">🕐 ${a.time}</div>
+            <div class="card-title-overlay">${a.title}</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-emotion-row">
+            <button class="card-emotion-btn kami" onclick="event.stopPropagation();quickLog('${a.id}','kami')">✨</button>
+            <button class="card-emotion-btn yoin" onclick="event.stopPropagation();quickLog('${a.id}','yoin')">🌊</button>
+            <button class="card-emotion-btn fubin" onclick="event.stopPropagation();quickLog('${a.id}','fubin')">💔</button>
+          </div>
+          ${score > 0 ? `<div class="card-score"><span class="card-score-num">${score}</span><span class="card-score-label">pt 今週</span></div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ============================================================
+// フィルター
+// ============================================================
+function filterWorks(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+}
+
+// ============================================================
+// クイックログ（カードから）
+// ============================================================
+function quickLog(animeId, type) {
+  const a = ANIMES.find(x => x.id === animeId);
+  logScore(animeId, type);
+  const labels = { kami:'✨ 神 +5pt', yoin:'🌊 余韻 +3pt', fubin:'💔 不憫 +1pt' };
+  showToast(`${a.emoji} ${labels[type]}`);
+  renderGrid();
+}
+
+// ============================================================
+// モーダル
+// ============================================================
+function openModal(animeId) {
+  currentAnime = ANIMES.find(a => a.id === animeId);
+  const a = currentAnime;
+
+  // サムネ
+  const thumbEl = document.getElementById('modal-thumb');
+  if (a.imageUrl) {
+    thumbEl.innerHTML = `<img src="${a.imageUrl}" alt="${a.title}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<div class=modal-thumb-dummy>${a.emoji}</div>'">`;
+  } else {
+    thumbEl.innerHTML = `<div class="modal-thumb-dummy" style="background:linear-gradient(135deg,${a.color1},${a.color2})">${a.emoji}</div>`;
+  }
+
+  // メタ情報
+  document.getElementById('modal-meta').innerHTML = `
+    <div class="modal-title">${a.title}</div>
+    <div class="modal-tags">
+      <span class="modal-tag ${a.pk}">${a.platform}</span>
+      ${a.note ? `<span class="modal-tag" style="background:rgba(77,184,212,0.15);color:var(--accent)">${a.note}</span>` : ''}
+    </div>
+    <div class="modal-time">🕐 ${a.time} / ${a.dayLabel}曜日</div>
+  `;
+
+  updateModalScore();
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function modalLogEmotion(type) {
+  if (!currentAnime) return;
+  logScore(currentAnime.id, type);
+  const labels = { kami:'✨ 神 +5pt', yoin:'🌊 余韻 +3pt', fubin:'💔 不憫 +1pt' };
+  showToast(`${currentAnime.emoji} ${labels[type]}`);
+  updateModalScore();
+  renderGrid();
+}
+
+function updateModalScore() {
+  if (!currentAnime) return;
+  const weekData = loadData(getWeekKey());
+  const d = weekData[currentAnime.id] || { kami:0, yoin:0, fubin:0, total:0 };
+  document.getElementById('modal-score-row').innerHTML = `
+    <div class="msr-item"><div class="msr-num kami">${d.kami}</div><div class="msr-label">✨ 神</div></div>
+    <div class="msr-divider"></div>
+    <div class="msr-item"><div class="msr-num yoin">${d.yoin}</div><div class="msr-label">🌊 余韻</div></div>
+    <div class="msr-divider"></div>
+    <div class="msr-item"><div class="msr-num fubin">${d.fubin}</div><div class="msr-label">💔 不憫</div></div>
+    <div class="msr-divider"></div>
+    <div class="msr-item"><div class="msr-num" style="color:var(--accent)">${d.total}</div><div class="msr-label">合計pt</div></div>
+  `;
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-overlay')) {
+    document.getElementById('modal-overlay').classList.remove('show');
+    currentAnime = null;
+  }
+}
+
+// ============================================================
+// スコア記録（共通）
+// ============================================================
+function logScore(animeId, type) {
+  const score = SCORES[type];
+  // 週次
+  const wk = getWeekKey();
+  const wd = loadData(wk);
+  if (!wd[animeId]) wd[animeId] = { kami:0, yoin:0, fubin:0, total:0 };
+  wd[animeId][type]++; wd[animeId].total += score;
+  saveData(wk, wd);
+  // シーズン
+  const sd = loadData(SEASON_KEY);
+  if (!sd[animeId]) sd[animeId] = { kami:0, yoin:0, fubin:0, total:0 };
+  sd[animeId][type]++; sd[animeId].total += score;
+  saveData(SEASON_KEY, sd);
+}
+
+// ============================================================
+// トースト
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ============================================================
+// 初期化
+// ============================================================
+renderGrid();
+</script>
+</body>
+</html>
