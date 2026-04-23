@@ -251,6 +251,22 @@ main { position:relative; z-index:1; padding:20px 16px; }
   transition:width 0.6s cubic-bezier(.34,1.2,.64,1);
 }
 
+
+/* ===== Xシェアボタン ===== */
+.x-share-btn {
+  width:100%; padding:13px; border-radius:12px; cursor:pointer;
+  background: rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.15);
+  color:var(--text); font-family:'Noto Sans JP',sans-serif;
+  font-size:14px; font-weight:700; letter-spacing:1px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:all 0.15s; margin-bottom:20px;
+  text-decoration:none;
+}
+.x-share-btn:hover { background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.25); }
+.x-share-btn:active { transform:scale(0.98); }
+.x-logo { font-size:18px; font-weight:900; }
+
 /* ===== ゼロ状態 ===== */
 .empty-state {
   text-align:center; padding:48px 20px; color:var(--muted2);
@@ -345,6 +361,12 @@ main { position:relative; z-index:1; padding:20px 16px; }
 
   <!-- 週ラベル -->
   <div class="week-label" id="week-label"></div>
+
+
+  <!-- Xシェアボタン -->
+  <a class="x-share-btn" id="x-share-btn" href="#" target="_blank" rel="noopener" style="display:none">
+    <span class="x-logo">𝕏</span> 今週のTOP3をポストする
+  </a>
 
   <!-- TOP3 表彰台 -->
   <div class="podium" id="podium"></div>
@@ -527,6 +549,10 @@ function renderRanking() {
       </div>`;
   }).join('');
 
+
+  // Xシェアボタン更新
+  updateShareButton(ranked);
+
   // 4位以下
   const rest = ranked.slice(3);
   if (rest.length === 0) {
@@ -557,6 +583,33 @@ function renderRanking() {
         </div>`;
     }).join('');
   }
+}
+
+
+// ============================================================
+// Xシェアボタン生成
+// ============================================================
+function updateShareButton(ranked) {
+  const btn = document.getElementById('x-share-btn');
+  if (!ranked.length) {
+    btn.style.display = 'none';
+    return;
+  }
+  btn.style.display = 'flex';
+
+  const medals = ['🥇','🥈','🥉'];
+  const top3lines = ranked.slice(0,3).map((a,i) =>
+    `${medals[i]} ${a.title} ${a.total}pt`
+  ).join('\n');
+
+  const period = currentPeriod === 'weekly' ? '今週' : 'シーズン';
+  const totalKami  = ranked.reduce((s,a)=>s+a.kami,0);
+  const totalYoin  = ranked.reduce((s,a)=>s+a.yoin,0);
+  const totalFubin = ranked.reduce((s,a)=>s+a.fubin,0);
+
+  const text = `📺 ${period}のAnimeSync感情ランキング\n\n${top3lines}\n\n✨神×${totalKami} 🌊余韻×${totalYoin} 💔不憫×${totalFubin}\n\n#AnimeSync #2026春アニメ`;
+
+  btn.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
 }
 
 // ============================================================
