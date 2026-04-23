@@ -43,9 +43,14 @@
     background: rgba(8,12,20,0.92);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    display: flex; align-items: center; justify-content: space-between;
-    height: 56px;
+    padding: 0;
+    flex-direction: column;
+    display: flex;
+  }
+  .header-top {
+    padding: 0 20px;
+    height: 48px;
+    display: flex; align-items: center;
   }
   .logo {
     font-family: 'Bebas Neue', sans-serif;
@@ -58,22 +63,29 @@
 
   /* ナビ */
   nav {
-    display: flex; gap: 4px;
+    display: flex; gap: 0;
+    border-top: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
   }
+  nav::-webkit-scrollbar { display: none; }
   nav button {
     background: none; border: none; cursor: pointer;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-family: 'Zen Kaku Gothic New', sans-serif;
-    font-size: 13px;
+    padding: 10px 16px;
+    flex-shrink: 0;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px; font-weight: 700;
     color: var(--muted);
     transition: all 0.2s;
+    border-bottom: 2px solid transparent;
   }
   nav button.active, nav button:hover {
     color: var(--text);
-    background: var(--card);
   }
-  nav button.active { color: var(--accent); }
+  nav button.active {
+    color: var(--accent);
+    border-bottom: 2px solid var(--accent);
+  }
 
   /* メインコンテナ */
   main { position:relative; z-index:1; padding: 24px 20px; max-width: 860px; margin:0 auto; }
@@ -286,7 +298,9 @@
 <body>
 
 <header>
-  <div class="logo">AnimeSync <span>2026 WINTER</span></div>
+  <div class="header-top">
+    <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">AnimeSync <span>2026 WINTER</span></div>
+  </div>
   <nav>
     <button class="active" onclick="showSection('schedule',this)">📅 スケジュール</button>
     <button onclick="showSection('log',this)">🎭 感情ログ</button>
