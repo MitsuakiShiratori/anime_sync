@@ -429,26 +429,26 @@ main { position:relative; z-index:1; }
 // ============================================================
 const ANIMES = [
   // 月曜
-  { id:'tongari',    title:'とんがり帽子のアトリエ',         emoji:'🧙', day:1, time:'23:00', platform:'Netflix',      pk:'unext', note:'先行', color1:'#0a1020', color2:'#142040', heat:88 },
+  { id:'tongari',    title:'とんがり帽子のアトリエ',         emoji:'🧙', day:1, time:'23:00', platform:'Netflix',      pk:'unext', note:'先行', img:'./tongariboushi.jpg', color1:'#0a1020', color2:'#142040', heat:88 },
   // 火曜
-  { id:'replica',    title:'レプリカだって恋をする',          emoji:'💘', day:2, time:'24:00', platform:'ABEMA',        pk:'abema', note:'先行', color1:'#1a0810', color2:'#300e20', heat:82 },
-  { id:'aisiteru',   title:'愛してるゲームを終わらせたい',    emoji:'🎮', day:2, time:'23:30', platform:'ABEMA',        pk:'abema', note:'先行', color1:'#180a0a', color2:'#2e1010', heat:85 },
-  { id:'hidari',     title:'左ききのエレン',                  emoji:'🎨', day:2, time:'24:30', platform:'Prime Video',  pk:'prime', note:'先行', color1:'#0a1218', color2:'#102030', heat:80 },
-  { id:'otaku',      title:'クラスで2番目に可愛い女の子と友だちになった', emoji:'🎀', day:2, time:'24:00', platform:'U-NEXT', pk:'unext', note:'', color1:'#1a0a18', color2:'#2e1030', heat:79 },
-  { id:'awashima',   title:'淡島百景',                        emoji:'🌸', day:2, time:'26:15', platform:'ABEMA',        pk:'abema', note:'',     color1:'#180818', color2:'#2a102a', heat:72 },
-  { id:'ichitatami', title:'一畳間まんきつ暮らし！',           emoji:'🍜', day:2, time:'26:00', platform:'ABEMA',        pk:'abema', note:'',     color1:'#101808', color2:'#1a2a10', heat:68 },
+  { id:'replica',    title:'レプリカだって恋をする',          emoji:'💘', day:2, time:'24:00', platform:'ABEMA',        pk:'abema', note:'先行', img:'./repurica.jpg', color1:'#1a0810', color2:'#300e20', heat:82 },
+  { id:'aisiteru',   title:'愛してるゲームを終わらせたい',    emoji:'🎮', day:2, time:'23:30', platform:'ABEMA',        pk:'abema', note:'先行', img:'./aishiterugame.jpg', color1:'#180a0a', color2:'#2e1010', heat:85 },
+  { id:'hidari',     title:'左ききのエレン',                  emoji:'🎨', day:2, time:'24:30', platform:'Prime Video',  pk:'prime', note:'先行', img:'./hidarikikinoeren.jpg', color1:'#0a1218', color2:'#102030', heat:80 },
+  { id:'otaku',      title:'クラスで2番目に可愛い女の子と友だちになった', emoji:'🎀', day:2, time:'24:00', platform:'U-NEXT', pk:'unext', note:'', img:'./classde2banme.jpg', color1:'#1a0a18', color2:'#2e1030', heat:79 },
+  { id:'awashima',   title:'淡島百景',                        emoji:'🌸', day:2, time:'26:15', platform:'ABEMA',        pk:'abema', note:'',     img:'./awashimahyakkei.jpg', color1:'#180818', color2:'#2a102a', heat:72 },
+  { id:'ichitatami', title:'一畳間まんきつ暮らし！',           emoji:'🍜', day:2, time:'26:00', platform:'ABEMA',        pk:'abema', note:'',     img:'./1jyohan.jpg', color1:'#101808', color2:'#1a2a10', heat:68 },
   // 木曜
-  { id:'koori',      title:'氷の城壁',                        emoji:'🧊', day:4, time:'24:30', platform:'Netflix',      pk:'unext', note:'先行', color1:'#081820', color2:'#0c2a38', heat:83 },
-  { id:'kiriwo',     title:'霧尾ファンクラブ',                emoji:'🌫️', day:4, time:'25:00', platform:'ABEMA',       pk:'abema', note:'',     color1:'#101018', color2:'#1a1a2a', heat:75 },
+  { id:'koori',      title:'氷の城壁',                        emoji:'🧊', day:4, time:'24:30', platform:'Netflix',      pk:'unext', note:'先行', img:'./koorinojyoheki.jpg', color1:'#081820', color2:'#0c2a38', heat:83 },
+  { id:'kiriwo',     title:'霧尾ファンクラブ',                emoji:'🌫️', day:4, time:'25:00', platform:'ABEMA',       pk:'abema', note:'',     img:'./kiriofunclub.jpg', color1:'#101018', color2:'#1a1a2a', heat:75 },
   // 金曜
-  { id:'kamiike',    title:'上伊那ぼたん、酔える姿は百合の花', emoji:'🌺', day:5, time:'24:00', platform:'ABEMA',       pk:'abema', note:'先行', color1:'#180a10', color2:'#2e1020', heat:77 },
+  { id:'kamiike',    title:'上伊那ぼたん、酔える姿は百合の花', emoji:'🌺', day:5, time:'24:00', platform:'ABEMA',       pk:'abema', note:'先行', img:'./kamiinabotan.jpg', color1:'#180a10', color2:'#2e1020', heat:77 },
   // 土曜
-  { id:'otaku2',     title:'オタクに優しいギャルはいない',     emoji:'💅', day:6, time:'12:00', platform:'ABEMA',        pk:'abema', note:'',     color1:'#1a0a18', color2:'#2e1030', heat:79 },
-  { id:'haruyuki',   title:'春夏秋冬代行者',                  emoji:'🍂', day:6, time:'24:00', platform:'Netflix',      pk:'unext', note:'',     color1:'#181008', color2:'#2a1a08', heat:86 },
-  { id:'kaminiwa',   title:'神の庭付き楠木邸',                emoji:'🌳', day:6, time:'26:00', platform:'ABEMA',        pk:'abema', note:'先行', color1:'#081408', color2:'#0e2210', heat:74 },
+  { id:'otaku2',     title:'オタクに優しいギャルはいない',     emoji:'💅', day:6, time:'12:00', platform:'ABEMA',        pk:'abema', note:'',     img:'./otakuniyasashii.jpg', color1:'#1a0a18', color2:'#2e1030', heat:79 },
+  { id:'haruyuki',   title:'春夏秋冬代行者',                  emoji:'🍂', day:6, time:'24:00', platform:'Netflix',      pk:'unext', note:'',     img:'./syunkasyuutou.jpg', color1:'#181008', color2:'#2a1a08', heat:86 },
+  { id:'kaminiwa',   title:'神の庭付き楠木邸',                emoji:'🌳', day:6, time:'26:00', platform:'ABEMA',        pk:'abema', note:'先行', img:'./kaminoniwa.jpg', color1:'#081408', color2:'#0e2210', heat:74 },
   // 日曜
-  { id:'akane',      title:'あかね噺',                        emoji:'🎭', day:0, time:'24:00', platform:'Netflix',      pk:'unext', note:'先行', color1:'#1a0808', color2:'#2e1008', heat:90 },
-  { id:'nihonsangoku', title:'日本三國',                      emoji:'⚔️', day:0, time:'21:00', platform:'Prime Video',  pk:'prime', note:'先行', color1:'#100808', color2:'#201010', heat:87 },
+  { id:'akane',      title:'あかね噺',                        emoji:'🎭', day:0, time:'24:00', platform:'Netflix',      pk:'unext', note:'先行', img:'./akanebanashi.jpg', color1:'#1a0808', color2:'#2e1008', heat:90 },
+  { id:'nihonsangoku', title:'日本三國',                      emoji:'⚔️', day:0, time:'21:00', platform:'Prime Video',  pk:'prime', note:'先行', img:'./nihonsankoku.jpg', color1:'#100808', color2:'#201010', heat:87 },
 ];
 
 const DAYS = ['日','月','火','水','木','金','土'];
@@ -491,7 +491,9 @@ function renderToday() {
   container.innerHTML = todayAnimes.map((a, i) => `
     <div class="today-card" style="animation-delay:${i*0.08}s">
       <div class="today-card-top">
-        <div class="today-emoji">${a.emoji}</div>
+        <div class="today-emoji" style="width:52px;height:52px;border-radius:8px;overflow:hidden;flex-shrink:0">
+        ${a.img ? `<img src="${a.img}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" onerror="this.parentElement.innerHTML='${a.emoji}'" alt="">` : a.emoji}
+      </div>
         <div class="today-info">
           <div class="today-title">${a.title}</div>
           <div class="today-time">
@@ -565,8 +567,11 @@ function renderTrending() {
   el.innerHTML = sorted.map((a, i) => `
     <div class="trend-card" style="animation-delay:${i*0.06}s">
       <div class="trend-thumb">
-        <div class="trend-thumb-bg" style="--c1:${a.color1};--c2:${a.color2}"></div>
-        <div class="trend-thumb-emoji">${a.emoji}</div>
+        ${a.img
+          ? `<img src="${a.img}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0" onerror="this.style.display='none'" alt="">`
+          : `<div class="trend-thumb-bg" style="--c1:${a.color1};--c2:${a.color2}"></div>`
+        }
+        <div class="trend-thumb-emoji" style="${a.img ? 'display:none' : ''}">${a.emoji}</div>
       </div>
       <div class="trend-body">
         <div class="trend-title">${a.title}</div>
